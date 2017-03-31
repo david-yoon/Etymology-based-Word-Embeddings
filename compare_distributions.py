@@ -48,7 +48,7 @@ if IS_CHINESE_TEST:
         synonyms = [line.strip() for line in f]
         
 else:
-    with codecs.open('./data/synonums/korean_synonyms.csv', encoding='utf-8') as f:
+    with codecs.open('./data/synonums/korean_synonyms.csv', 'r', encoding='utf-8') as f:
         synonyms = [line.strip() for line in f]
 
 

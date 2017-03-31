@@ -1,46 +1,97 @@
-import requests as r
-import csv
-import json
-import urllib.parse as up
+#-*- coding: utf-8 -*-
+
+'''
+date  : 2017. 04. 01
+author: dato
+where : SNU milab
+what  : crawl synonym data from "chinesetool.eu" web page
+        use chinese dictionary data as query words
+'''
 from bs4 import BeautifulSoup
-import time
+import urllib
+import networkx as nx
+import codecs
+import argparse
 
-G = nx.read_graphml('../data/graphs/chinese_graph.graphml', unicode)
 
-wds = list(G.node[a]['chinese'] for a in G.node.keys() if 'word' in G.node[a])
+def run_code():
 
-baseUrl = "http://www.chinesetools.eu/tools/synonym/"
-synPairs = []
-antPairs = []
-
-for i,w in enumerate(wds):
-    if i % 20 == 0: 
-        print("Done {} words. Got {} synonyms, {} antonyms."
-              .format(i,len(synPairs),len(antPairs)))
-    time.sleep(0.2)
-    res = r.get(baseUrl+w)
-    sp = BeautifulSoup(res.text)
-    ows = sp.select('.opposite-word')
-    if len(ows) == 0: continue
-    art = ows[0].parent
-    dvs = art.select('div')
-    doneSyn = False
+    print ( "process from {} to {}".format(args.start, args.end) )
     
-    for dv in dvs[1:]: # Skipping the first one...
-        if dv['class'] == 'opposite-word':
-            doneSyn = True
+    G = nx.read_graphml('../data/graphs/chinese_graph.graphml', unicode)
+    words = list(G.node[a]['chinese'] for a in G.node.keys() if 'chinese' in G.node[a])
+
+    base_url = "https://www.chinesetools.eu/tools/synonym/"
+
+    def url_encoding(data) :
+        tmp = ''
+        for i in xrange( len(data) ):
+            tmp = tmp + '&#' + str(ord(data[i])) + ';'
+
+        return urllib.quote(tmp)
+
+
+    f = codecs.open('chinesetools_synonym_' + str(args.start) + '-' + str(args.end) + '.csv','w', encoding='utf-8')
+
+    syn_counter = 0
+    index = 0
+        
+
+    for i in xrange(len(words)):
+        
+        index = i + args.start
+        w = words[index]
+
+        if index > args.end:
+            break    
+            
+        print("[{}/{}] now processing: {} , got {} synonyms"
+                  .format(index, args.end, w.encode('utf-8'), syn_counter))        
+
+        query = base_url + '?q=' + url_encoding(w) + '&Submit=Search'
+        r = urllib.urlopen(query)
+        soup = BeautifulSoup(r)
+
+        parse = soup.find_all('div', 'arrondi_10')
+
+        if ( len(parse) < 2 ):
             continue
-        txt = dv.select('a')[0].text.strip()
-        if not doneSyn: 
-            synPairs.append([w,txt])
-        else: 
-            antPairs.append([w,txt])
+
+        # find the 'divs' which contain the synonym 
+        divs = parse[1].find_all('div')
+
+        # check if the html has nynonyms 
+        inner_finder = -1
+
+        for i, dv in enumerate(divs):
+            if dv.string == 'Click on the synonyms to see it on the Chinese dictionary:' :
+                inner_finder = i
+
+        if inner_finder is -1:
+            continue            
+
+        # grap synonym information
+        for dv in divs[inner_finder + 1].find_all('div'):
+            for a in dv.find_all('a'):
+                print w, a.string.strip()
+                #syn_pairs.append([w, a.string.strip()])
+                f.write("%s\n" % (w + ',' + a.string.strip()))
+                syn_counter = syn_counter + 1
+
+    f.close()
+
+
+    #with codecs.open('chinesetools_synonym.csv','w', encoding='utf-8') as f:
+    #    for item in syn_pairs:
+    #        print item[0]
+    #        f.write("%s\n" % item[0])
+
+
+if __name__ == '__main__':
+
+    p = argparse.ArgumentParser()
+    p.add_argument('--start', type=int, default=0)
+    p.add_argument('--end', type=int, default=0)
+    args = p.parse_args()
     
-
-with open('chineseSyn.csv','w') as f:
-    wr = csv.writer(f)
-    wr.writerows(synPairs)
-
-with open('chineseAnt.csv','w') as f:
-    wr = csv.writer(f)
-    wr.writerows(antPairs)
+    run_code()
