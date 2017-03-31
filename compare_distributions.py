@@ -1,4 +1,11 @@
-# coding: utf-8
+#-*- coding: utf-8 -*-
+
+'''
+date  : 2017. 04. 01
+author: dato
+where : SNU milab
+what  : calculate similairty among data-pairs
+'''
 
 import networkx as nx
 import numpy as np
@@ -8,6 +15,8 @@ from random import choice
 from math import log
 import codecs
 import csv
+import dato_utils
+
 
 IS_CHINESE_TEST = True
 
@@ -20,7 +29,10 @@ else:
     
 gen = nx.connected_component_subgraphs(G)
 G = next(gen)
-output_dir = "./output"
+
+# create forlder for output
+dato_utils.create_dir('result')
+output_dir = "./result"
 
 sts = nx.bipartite.sets(G)
 

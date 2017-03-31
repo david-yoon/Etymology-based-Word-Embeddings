@@ -1,17 +1,21 @@
+#-*- coding: utf-8 -*-
+
+'''
+date  : 2017. 04. 01
+author: dato
+where : SNU milab
+what  : crawl synonym data from "chinesetool.eu" web page
+        use chinese dictionary data as query words
+        
+        TBD ...
+        
+'''
+
 import requests as r
 from bs4 import BeautifulSoup
 import time
 from itertools import combinations
 from selenium import webdriver
-
-
-
-'''
-TBD
-
-crawl synonyms from "iciba.com"
-
-'''
 
 
 
