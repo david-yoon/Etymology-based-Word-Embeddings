@@ -15,6 +15,7 @@ from random import choice
 from math import log
 import codecs
 import csv
+from scipy import stats
 import dato_utils
 
 
@@ -54,9 +55,8 @@ wordic = {G.node[e]['chinese']:k for k,e in enumerate(words)}
 
 synonyms = None
 
-# synonyms delimeter = ',' 
 if IS_CHINESE_TEST:
-    with codecs.open('./data/synonyms/all_chinese_synonyms.csv', 'r', encoding='utf-8') as f:
+    with codecs.open('./data/synonyms/chinesetools_synonyms.csv', 'r', encoding='utf-8') as f:
         synonyms = [line.strip() for line in f]
         
 else:
@@ -87,8 +87,8 @@ if weight:
     print("Done weighting the matrix.")
 
     
-minK = 666
-maxK = 668
+minK = 100
+maxK = 110
 
 print("Starting")
 
@@ -119,7 +119,7 @@ for k in range(minK, maxK, 200):
         v1 = Vtr[wordic[c1]]
         v2 = Vtr[wordic[c2]]
         synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
-
+        #scipy.stats.entropy(v1, v2, base=None)
 
     for _ in synonyms:
         v1 = choice(Vtr)
