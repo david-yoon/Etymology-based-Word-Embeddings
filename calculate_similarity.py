@@ -19,13 +19,13 @@ from scipy import stats
 import dato_utils
 
 
-IS_CHINESE_TEST = True
+IS_CHINESE_TEST = False
 
 
 if IS_CHINESE_TEST:
     G = nx.read_graphml('./data/graphs/chinese_graph.graphml', unicode) # Chinese graph
 else:
-    G = nx.read_graphml('graphs/bipartite_graph.graphml', unicode) # Korean language graph    
+    G = nx.read_graphml('./data/graphs/bipartite_graph.graphml', unicode) # Korean language graph    
 
     
 gen = nx.connected_component_subgraphs(G)
@@ -60,7 +60,7 @@ if IS_CHINESE_TEST:
         synonyms = [line.strip() for line in f]
         
 else:
-    with codecs.open('./data/synonums/korean_synonyms.csv', 'r', encoding='utf-8') as f:
+    with codecs.open('./data/synonyms/korean_synonyms.csv', 'r', encoding='utf-8') as f:
         synonyms = [line.strip() for line in f]
 
 
@@ -87,29 +87,26 @@ if weight:
     print("Done weighting the matrix.")
 
     
-minK = 100
-maxK = 110
+minK = 2000
+maxK = 2100
 
 print("Starting")
 
-for k in range(minK, maxK, 200):
+for k in range(minK, maxK, 300):
     
     st = time.clock()
 
     print("Factorizing for k={}".format(k))
-    U,s,V = sp.sparse.linalg.svds(A, k)
+    U, s, V = sp.sparse.linalg.svds(A, k)
     Vtr = V.transpose()
 
     print("Factorized. Obtaining distribution.")
 
     # synonyms delimeter : ','  ex) 01,34
 
+    # calculate similarity among synonyms pairs
     for pr in synonyms:
 
-        # legacy ...
-        #c1 = pr[0]
-        #c2 = pr[1]
-        
         word = pr.split(',')
         c1 = word[0]
         c2 = word[1]
@@ -121,11 +118,13 @@ for k in range(minK, maxK, 200):
         synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
         #scipy.stats.entropy(v1, v2, base=None)
 
+    # calculate similarity among random pairs
     for _ in synonyms:
         v1 = choice(Vtr)
         v2 = choice(Vtr)
         randDP.append(np.dot(v1,v2))
 
+        
     del U
     del s
     del V
@@ -135,10 +134,10 @@ for k in range(minK, maxK, 200):
     print("Saving. Took {} seconds for k={}. Worked with {} syn, {} random pairs."
           .format(end-st,k,len(synDP),len(randDP)))
     
-    with codecs.open("{}/randdist_k={}.csv".format(output_dir,k), 'w', encoding='utf-8') as f:
+    with codecs.open("{}/randdist_k={}.csv".format(output_dir, k), 'w', encoding='utf-8') as f:
         wr = csv.writer(f)
         wr.writerows([[r] for r in randDP])
 
-    with codecs.open("{}/syndist_k={}.csv".format(output_dir,k), 'w') as f:
+    with codecs.open("{}/syndist_k={}.csv".format(output_dir, k), 'w') as f:
         wr = csv.writer(f)
         wr.writerows(synDP)
