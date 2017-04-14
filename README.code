@@ -1,0 +1,59 @@
+
+[chinese]
+
+adso.dat
+- chinese dictionary
+- ref: http://adsotrans.com/downloads/
+
+scrape_synonyms_chinesetools.py
+- scrape synonym data from "https://www.chinesetools.eu/tools/synonym/"
+
+run_scrape_chinesetool.sh
+- run "scrape_synonyms_chinesetools.py" in parallel 
+
+
+merge_file.py
+- after parallel scraping, merge all the data into single file
+
+
+scrape_synonyms_iciba.py
+- scrape synonym data from "http://www.iciba.com/"
+
+
+generate_bipartite_graph.py
+- generate bipartite graph from chinese dictionary
+
+
+[korean-chinese (sino-Korean)]
+
+scrape_synonym_naver.py
+- scrape synonym data from "http://hanja.naver.com/"
+
+
+
+[general]
+
+calculate_similarity.py
+- similarity calculation by using graph data and synonym set
+- chinese test     : IS_CHINESE_TEST = True
+  sino-korean test : IS_CHINESE_TEST = False
+- result will be stored at 'result' folder
+
+
+
+plot_two_dist_histogram.py
+- plot synonym and random histogram by using the result at result folder
+- ex) python plot_two_dist_histogram.py --dim 300 --plot 1
+  . dim: k-dim value you want to plot (related file should be prepared by "calculate_similarity.py")
+  . plot: 0 or 1 ( run matplot when the value is 1 )
+
+
+dato_utils.py
+- utility code
+
+
+
+
+
+
+

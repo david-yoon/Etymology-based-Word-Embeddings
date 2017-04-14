@@ -1,0 +1,25 @@
+[crawl data]
+./adso.dat
+- chinese dictionary
+- ref: http://adsotrans.com/downloads/
+
+./chinese_words.csv
+- extracted chinese dictionary
+
+./synonyms/korean_synonyms.csv
+- korean synonyms data crawl from korean dictionary
+- ref: http://hanja.naver.com/
+
+./synonyms/chinesetools_synonyms.csv
+- korean synonyms data crawl from chinese dictionary
+- ref: https://www.chinesetools.eu/tools/synonym/
+
+
+[graph data]
+python library "networkx"
+
+./graphs/bipartite_graph.graphml
+- bipartite graph file for sino-korean data
+
+./graphs/chinese_graph.graphml
+- bipartite graph file for chinese data

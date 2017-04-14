@@ -16,16 +16,18 @@ from math import log
 import codecs
 import csv
 from scipy import stats
+from sklearn.metrics.pairwise import cosine_similarity
 import dato_utils
 
 
-IS_CHINESE_TEST = False
+IS_CHINESE_TEST = True
 
 
 if IS_CHINESE_TEST:
     G = nx.read_graphml('./data/graphs/chinese_graph.graphml', unicode) # Chinese graph
 else:
     G = nx.read_graphml('./data/graphs/bipartite_graph.graphml', unicode) # Korean language graph    
+    #G = nx.read_graphml('./data/graphs/bipartite_2hanja_words.graphml', unicode) # Korean language graph    
 
     
 gen = nx.connected_component_subgraphs(G)
@@ -87,8 +89,8 @@ if weight:
     print("Done weighting the matrix.")
 
     
-minK = 2000
-maxK = 2100
+minK = 300
+maxK = 1000
 
 print("Starting")
 
@@ -115,8 +117,8 @@ for k in range(minK, maxK, 300):
 
         v1 = Vtr[wordic[c1]]
         v2 = Vtr[wordic[c2]]
-        synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
-        #scipy.stats.entropy(v1, v2, base=None)
+        #synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
+        synDP.append([ cosine_similarity(v1,v2)[0][0], c1.encode('utf-8'), c2.encode('utf-8') ] )
 
     # calculate similarity among random pairs
     for _ in synonyms:
