@@ -45,4 +45,5 @@ print 'number of nodes (chars + words): ', G.number_of_nodes()
 
 g_file_name = 'chinese_graph.graphml'
 print 'export graph file: ', g_file_name
-nx.write_graphml(G, g_file_name, encoding='utf-8')
+#nx.write_graphml(G, g_file_name, encoding='utf-8')
+nx.write_graphml(G, g_file_name)
