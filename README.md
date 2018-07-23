@@ -7,7 +7,7 @@
 This repo contains the code resulting from paper
 
 "Synonym Discovery with Etymology-based Word Embeddings"
-<a href="https://ieeexplore.ieee.org/abstract/document/8285290/"> <link></a>
+<a href="https://ieeexplore.ieee.org/abstract/document/8285290/"> \<link\> </a>
 
 
 ###Folders
