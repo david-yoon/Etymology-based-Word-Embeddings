@@ -58,16 +58,14 @@ wordic = {G.node[e]['chinese']:k for k,e in enumerate(words)}
 synonyms = None
 
 if IS_CHINESE_TEST:
-    with codecs.open('./data/synonyms/chinesetools_synonyms.csv', 'r', encoding='utf-8') as f:
+    with codecs.open('./data/synonyms/chinesetools_synonym_merge.csv', 'r', encoding='utf-8') as f:
+    #with codecs.open('./data/synonyms/all_chinese_synonyms.csv', 'r', encoding='utf-8') as f:
         synonyms = [line.strip() for line in f]
         
 else:
     with codecs.open('./data/synonyms/korean_synonyms.csv', 'r', encoding='utf-8') as f:
         synonyms = [line.strip() for line in f]
 
-
-synDP = []
-randDP = []
 
 A = nx.bipartite.biadjacency_matrix(G, hanjas)
 #A = A.asfptype()
@@ -89,12 +87,15 @@ if weight:
     print("Done weighting the matrix.")
 
     
-minK = 500
+minK = 1000
 maxK = 3000
 
 print("Starting")
 
-for k in range(minK, maxK, 300):
+for k in range(minK, maxK, 500):
+    
+    synDP = []
+    randDP = []
     
     st = time.clock()
 
@@ -106,6 +107,9 @@ for k in range(minK, maxK, 300):
 
     # synonyms delimeter : ','  ex) 01,34
 
+    no_cnt = 0
+    cnt = 0
+    
     # calculate similarity among synonyms pairs
     for pr in synonyms:
 
@@ -113,7 +117,11 @@ for k in range(minK, maxK, 300):
         c1 = word[0]
         c2 = word[1]
 
-        if c1 not in wordic or c2 not in wordic: continue
+        if c1 not in wordic or c2 not in wordic: 
+            no_cnt = no_cnt + 1
+            continue
+            
+        cnt = cnt + 1
 
         v1 = Vtr[wordic[c1]]
         v2 = Vtr[wordic[c2]]
@@ -123,7 +131,8 @@ for k in range(minK, maxK, 300):
         #synDP.append([ 1 - cosine_similarity(v1,v2)[0][0], c1.encode('utf-8'), c2.encode('utf-8') ] )
 
     # calculate similarity among random pairs
-    for _ in synonyms:
+    #for _ in synonyms:
+    for _ in xrange(cnt):
         v1 = choice(Vtr)
         v2 = choice(Vtr)
         randDP.append(np.dot(v1,v2))

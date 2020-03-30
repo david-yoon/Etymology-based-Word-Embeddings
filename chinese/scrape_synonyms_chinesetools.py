@@ -1,5 +1,3 @@
-#-*- coding: utf-8 -*-
-
 '''
 date  : 2017. 04. 01
 author: dato
@@ -12,6 +10,8 @@ import urllib
 import networkx as nx
 import codecs
 import argparse
+import csv
+import chardet
 
 
 def run_code():
@@ -31,12 +31,13 @@ def run_code():
         return urllib.quote(tmp)
 
 
-    f = codecs.open('chinesetools_synonym_' + str(args.start) + '-' + str(args.end) + '.csv','w', encoding='utf-8')
-
+    #f = codecs.open('chinesetools_synonym_' + str(args.start) + '-' + str(args.end) + '.csv','w', encoding='utf-8')
+    f = codecs.open('chinesetools_synonym_' + str(args.start) + '-' + str(args.end) + '.csv','wb')
+    writer = csv.writer(f, delimiter=',')
+    
     syn_counter = 0
     index = 0
         
-
     for i in xrange(len(words)):
         
         index = i + args.start
@@ -45,12 +46,11 @@ def run_code():
         if index > args.end:
             break    
             
-        print("[{}/{}] now processing: {} , got {} synonyms"
-                  .format(index, args.end, w.encode('utf-8'), syn_counter))        
+        print str(index) + "/" + str(args.end) + " target:  " + w        
 
         query = base_url + '?q=' + url_encoding(w) + '&Submit=Search'
         r = urllib.urlopen(query)
-        soup = BeautifulSoup(r)
+        soup = BeautifulSoup(r, 'lxml')
 
         parse = soup.find_all('div', 'arrondi_10')
 
@@ -60,7 +60,7 @@ def run_code():
         # find the 'divs' which contain the synonym 
         divs = parse[1].find_all('div')
 
-        # check if the html has nynonyms 
+        # check if the html has synonyms 
         inner_finder = -1
 
         for i, dv in enumerate(divs):
@@ -73,10 +73,10 @@ def run_code():
         # grap synonym information
         for dv in divs[inner_finder + 1].find_all('div'):
             for a in dv.find_all('a'):
-                print w, a.string.strip()
-                #syn_pairs.append([w, a.string.strip()])
-                f.write("%s\n" % (w + ',' + a.string.strip()))
+                print 'syn : ' + a.string.strip()
+                writer.writerow( [ unicode(w).encode('utf-8').strip(), unicode(a.string).encode('utf-8').strip() ] )
                 syn_counter = syn_counter + 1
+                break
 
     f.close()
 
