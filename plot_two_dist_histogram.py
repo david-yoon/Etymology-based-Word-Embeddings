@@ -30,7 +30,7 @@ def run_code():
     ks.append(dim)
     missRand.append(sum(1.0 if abs(rd) > sd else 0.0 for rd in ranDist)/len(ranDist))
     gotSyn.append(sum(1.0 if abs(rd) > sd else 0.0 for rd in synDist)/len(synDist))
-
+    
     print(" With k={} \n Misclassified random pairs: {} \n Accurately classified synonyms: {} \n"
           .format(dim, missRand[-1], gotSyn[-1]))
     

@@ -20,7 +20,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import dato_utils
 
 
-IS_CHINESE_TEST = True
+IS_CHINESE_TEST = False
 
 
 if IS_CHINESE_TEST:
@@ -89,8 +89,8 @@ if weight:
     print("Done weighting the matrix.")
 
     
-minK = 300
-maxK = 1000
+minK = 500
+maxK = 3000
 
 print("Starting")
 
@@ -117,8 +117,10 @@ for k in range(minK, maxK, 300):
 
         v1 = Vtr[wordic[c1]]
         v2 = Vtr[wordic[c2]]
-        #synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
-        synDP.append([ cosine_similarity(v1,v2)[0][0], c1.encode('utf-8'), c2.encode('utf-8') ] )
+        synDP.append([ np.dot(v1,v2), c1.encode('utf-8'), c2.encode('utf-8') ] )
+        #synDP.append([ cosine_similarity(v1,v2)[0][0], c1.encode('utf-8'), c2.encode('utf-8') ] )
+        # cosine_distance
+        #synDP.append([ 1 - cosine_similarity(v1,v2)[0][0], c1.encode('utf-8'), c2.encode('utf-8') ] )
 
     # calculate similarity among random pairs
     for _ in synonyms:
